@@ -21,8 +21,8 @@ Automated Biometric Attendance System using ATmega328p microcontroller, R307 fin
 ## v2.0
 <p align="center">
   
-  ![WhatsApp Image 2024-11-10 at 11 26 56 PM (2)](https://github.com/user-attachments/assets/1a1b4af2-c057-49f2-ac32-e3eedb9a762e | width=100)
-  ![WhatsApp Image 2024-11-10 at 11 26 56 PM (1)](https://github.com/user-attachments/assets/3610b627-3cd9-4aed-978f-bf5775ae44b7 | width=100)
+  ![WhatsApp Image 2024-11-10 at 11 26 56 PM (2)](https://github.com/user-attachments/assets/1a1b4af2-c057-49f2-ac32-e3eedb9a762e){: width="50%"}
+  ![WhatsApp Image 2024-11-10 at 11 26 56 PM (1)](https://github.com/user-attachments/assets/3610b627-3cd9-4aed-978f-bf5775ae44b7)
   ![WhatsApp Image 2024-11-10 at 11 26 55 PM](https://github.com/user-attachments/assets/3e02b022-35ee-4b42-8319-aaab341ae15b)
   ![WhatsApp Image 2024-11-10 at 11 26 56 PM](https://github.com/user-attachments/assets/962d7dcc-0c6e-4707-9ea5-e418ab904550)
   Hardware Assembly Pictures
