@@ -18,7 +18,7 @@ Automated Biometric Attendance System using ATmega328p microcontroller, R307 fin
 - The ArduTooth app displays real-time student entry and exit times.
 - TimeLib.h library in Arduino IDE enables time tracking. The sync message is sent by getting the Epoch Timestamp using the conversion tool - https://www.epochconverter.com/
 - OLED display, buzzer, and LEDs for a seamless user interface.
-
+##
 ## v2.0
 <img src="https://github.com/user-attachments/assets/1a1b4af2-c057-49f2-ac32-e3eedb9a762e" alt="" width="600">
 <img src="https://github.com/user-attachments/assets/3610b627-3cd9-4aed-978f-bf5775ae44b7" alt="" width="600">
@@ -36,6 +36,8 @@ Hardware Assembly Pictures
 - Google Sheets automatically logs each student's entry and exit times for easy tracking and record-keeping.
 
 <img src="https://github.com/user-attachments/assets/97b99318-5b3f-42bd-a757-75b8740971fc" alt="" width="600">
+
+##
 
 **Project Status: Ongoing**
 - **Remaining Tasks:**
