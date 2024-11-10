@@ -35,7 +35,7 @@ Hardware Assembly Pictures
 - A `Code.gs` script fetches the associated student data from Firebase based on the scanned fingerprint ID.
 - Google Sheets automatically logs each student's entry and exit times for easy tracking and record-keeping.
 
-<img src="https://github.com/user-attachments/assets/97b99318-5b3f-42bd-a757-75b8740971fc" alt="" width="400">
+<img src="https://github.com/user-attachments/assets/97b99318-5b3f-42bd-a757-75b8740971fc" alt="" width="600">
 
 **Project Status: Ongoing**
 - **Remaining Tasks:**
