@@ -19,7 +19,7 @@ Automated Biometric Attendance System using ATmega328p microcontroller, R307 fin
 - OLED display, buzzer, and LEDs for a seamless user interface.
 
 ## v2.0
-<img src="https://github.com/user-attachments/assets/1a1b4af2-c057-49f2-ac32-e3eedb9a762e" alt="" width="100" height="100">
+<img src="https://github.com/user-attachments/assets/1a1b4af2-c057-49f2-ac32-e3eedb9a762e" alt="" width="500">
 
 ![WhatsApp Image 2024-11-10 at 11 26 56 PM (2)](https://github.com/user-attachments/assets/1a1b4af2-c057-49f2-ac32-e3eedb9a762e)
 ![WhatsApp Image 2024-11-10 at 11 26 56 PM (1)](https://github.com/user-attachments/assets/3610b627-3cd9-4aed-978f-bf5775ae44b7)
