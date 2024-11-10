@@ -37,5 +37,5 @@ Hardware Assembly Pictures
 
 **Project Status: Ongoing**
 - **Remaining Tasks:**
-  - Implement functionality to mark students as present/absent based on their in and out times, and calculate their attendance percentage.
-  - Develop a mobile application to facilitate easy collection and management of student data.
+  - [ ] Implement functionality to mark students as present/absent based on their in and out times, and calculate their attendance percentage.
+  - [ ] Develop a mobile application to facilitate easy collection and management of student data.
