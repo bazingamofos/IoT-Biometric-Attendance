@@ -8,6 +8,7 @@ Automated Biometric Attendance System using ATmega328p microcontroller, R307 fin
 
   <img src="https://github.com/bazingamofos/Biometric-Attendance-System/assets/69231405/99f6e2ca-43bd-4a17-8433-674ca3d24192" alt="" width="600">
   <img src="https://github.com/bazingamofos/Biometric-Attendance-System/assets/69231405/09e9101d-0079-4598-a5cb-14f75e9325a4" alt="" width="600">
+  
   Hardware Assembly Pictures
 </p>
 
@@ -23,6 +24,7 @@ Automated Biometric Attendance System using ATmega328p microcontroller, R307 fin
 <img src="https://github.com/user-attachments/assets/3610b627-3cd9-4aed-978f-bf5775ae44b7" alt="" width="600">
 <img src="https://github.com/user-attachments/assets/3e02b022-35ee-4b42-8319-aaab341ae15b" alt="" width="600">
 <img src="https://github.com/user-attachments/assets/962d7dcc-0c6e-4707-9ea5-e418ab904550" alt="" width="600">
+
 Hardware Assembly Pictures
 
 **Project Overview:**
