@@ -1,0 +1,54 @@
+{
+  "students": {
+    "details": {
+      "stud_1": {
+        "name": "Flavia Saldanha",
+        "stud_id": 211021007,
+        "stud_email": "fsaldanha_b21@el.vjti.ac.in",
+        "fing_id": 1
+      },
+      "stud_2": {
+        "name": "Vanessa Abrams",
+        "stud_id": 211021010,
+        "stud_email": "vaabrams_b21@el.vjti.ac.in",
+        "fing_id": 2
+      },
+      "stud_3": {
+        "name": "Blair Waldorf",
+        "stud_id": 211061011,
+        "stud_email": "bewaldorf_b21@el.vjti.ac.in",
+        "fing_id": 3
+      },
+      "stud_4": {
+        "name": "Charles Bass",
+        "stud_id": 211060069,
+        "stud_email": "cbbass_b21@el.vjti.ac.in",
+        "fing_id": 4
+      },
+      "stud_5": {
+        "name": "Nathaniel Archibald",
+        "stud_id": 211060007,
+        "stud_email": "nharchibald_b21@el.vjti.ac.in",
+        "fing_id": 5
+      },
+      "stud_6": {
+        "name": "Daniel Humphrey",
+        "stud_id": 211060001,
+        "stud_email": "drhumphrey_b21@el.vjti.ac.in",
+        "fing_id": 6
+      },
+      "stud_7": {
+        "name": "Serena Van Der Woodsen",
+        "stud_id": 211061022,
+        "stud_email": "swvdwoodsen_b21@el.vjti.ac.in",
+        "fing_id": 7
+      },
+      "stud_8": {
+        "name": "Damien Dalgaard",
+        "stud_id": 211060072,
+        "stud_email": "ddalgaard_b21@el.vjti.ac.in",
+        "fing_id": 8
+      }
+    }
+  }
+}
