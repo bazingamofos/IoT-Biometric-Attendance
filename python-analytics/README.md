@@ -83,9 +83,10 @@ GNU GENERAL PUBLIC LICENSE
 Copyright (C) 2007 Free Software Foundation, Inc. <https://fsf.org/>
 Everyone is permitted to copy and distribute verbatim copies
 ```
----
-```
 
+---
+
+```
 ### Key Points:
 - The `credentials.json` is sensitive and should not be uploaded publicly.
 - The `NGROK_AUTH_TOKEN` is used for ngrok authentication and should be kept secret.
