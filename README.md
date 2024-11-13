@@ -4,6 +4,7 @@ Automated Biometric Attendance System using ATmega328p microcontroller, R307 fin
 <p align="center">
 
   ![Screenshot 2023-12-27 154034](https://github.com/bazingamofos/Biometric-Attendance-System/assets/69231405/763877a2-9be5-462b-9fd7-aca0902ee1bc)
+  
   Hardware Schematic
 
   <img src="https://github.com/bazingamofos/Biometric-Attendance-System/assets/69231405/99f6e2ca-43bd-4a17-8433-674ca3d24192" alt="" width="600">
@@ -20,6 +21,11 @@ Automated Biometric Attendance System using ATmega328p microcontroller, R307 fin
 - OLED display, buzzer, and LEDs for a seamless user interface.
 ##
 ## v2.0
+
+![image](https://github.com/user-attachments/assets/022fed23-dc00-4d05-8ee6-d194c4fe99ee)
+
+Hardware Schematic
+
 <img src="https://github.com/user-attachments/assets/1a1b4af2-c057-49f2-ac32-e3eedb9a762e" alt="" width="600">
 <img src="https://github.com/user-attachments/assets/3610b627-3cd9-4aed-978f-bf5775ae44b7" alt="" width="600">
 <img src="https://github.com/user-attachments/assets/3e02b022-35ee-4b42-8319-aaab341ae15b" alt="" width="600">
@@ -76,6 +82,19 @@ This project automates the process of updating attendance in a Google Sheet base
 
 3. **Timely Trigger**:
    - A trigger is set to automatically call the `doPost` function every minute, ensuring attendance data is updated periodically.
+  
+---
+
+## Demo
+
+Here is a demonstration video of the IoT Attendance System in action:
+
+[![Demo Video](https://img.youtube.com/vi/yBd02_0_lxA/0.jpg)](https://www.youtube.com/watch?v=yBd02_0_lxA)
+
+Click on the image to watch the demo video.
+
+---
+
 
 ## Google Apps Script
 
