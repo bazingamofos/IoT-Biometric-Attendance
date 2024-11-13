@@ -102,6 +102,8 @@ The Google Apps Script file handles the following operations:
 ### 4. **Setting up Google Apps Script Trigger**:
    - In the Google Apps Script editor, go to **Triggers** (clock icon) in the sidebar.
    - Create a new trigger for the `doPost` function, set it to run **Time-driven** every **minute**.
+   - ![image](https://github.com/user-attachments/assets/b08b1d31-1425-492d-95a5-5470dcdb719a)
+
 
 ### 5. **Deploying the Script**:
    - After setting up the script, deploy it as a web app with appropriate permissions to allow external requests to interact with it.
