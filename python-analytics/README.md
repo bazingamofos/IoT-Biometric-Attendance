@@ -1,4 +1,3 @@
-```markdown
 # IoT-Based Biometric Attendance System with Google Sheets Integration
 
 This project implements an IoT-based biometric attendance system that captures attendance data using fingerprint sensors and stores it in Google Sheets. It provides a Jupyter Notebook (`sheets.ipynb`) to update attendance records, calculate attendance percentages, and highlight defaulters in the Google Sheets document.
