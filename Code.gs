@@ -1,9 +1,14 @@
-var sheet_id = "SHEET-ID"; // replace with your Sheet ID
+var sheet_id = "YOUR_SHEET_ID"; // Replace with your Google Sheet ID
 var sheet_name = "Attendance";
 
 function doGet(e) {
   updateEntry(e);
   updateGoogleSheetsWithStudentData();
+}
+
+function parseDate(dateStr) {
+  let [day, month, year] = dateStr.split('/').map(Number); // Split and convert to numbers
+  return new Date(year, month - 1, day); // Create Date object (months are 0-indexed)
 }
 
 function updateEntry(e) {
@@ -16,9 +21,9 @@ function updateEntry(e) {
   var lastRow = sheet.getLastRow();
   
   var foundRow = -1;
-  
+
   if (sheet.getRange(1, 8).getValue() == "") {
-    sheet.getRange(1,8).setValue(date);
+    sheet.getRange(1, 8).setValue(date);
   }
 
   var lastCol = sheet.getLastColumn();
@@ -26,10 +31,11 @@ function updateEntry(e) {
   // Check the last date in the header row to compare
   var uniqueDateFound = false;
   for (var j = 8; j <= lastCol; j++) {
-    var existingDate = sheet.getRange(1, j).getValue();
-    var formattedExistingDate = (existingDate.getMonth() + 1) + "/" + existingDate.getDate() + "/" + existingDate.getFullYear();
-    var newDate = String(date.replace(/^0(\d)\//, "$1/"));
-    if (formattedExistingDate == newDate) {
+    var existingDate = String(sheet.getRange(1, j).getValue());
+    let parsedDate1 = parseDate(date);
+    let parsedDate2 = parseDate(existingDate);
+
+    if (parsedDate1.getTime() === parsedDate2.getTime())  {
       uniqueDateFound = true; // Date already exists, so don't insert a new column
       break;
     }
@@ -44,8 +50,8 @@ function updateEntry(e) {
     }
   }
 
-  // If the date is unique, insert it into the next available column
-  if (!uniqueDateFound) {
+  // Insert date if unique and only if `foundRow` is a valid row
+  if (!uniqueDateFound && foundRow > 0) {
     sheet.getRange(foundRow, 5).setValue("");
     sheet.getRange(foundRow, 6).setValue("");
     for (var k = 1; k <= lastCol; k++) {
@@ -55,7 +61,6 @@ function updateEntry(e) {
       }
     }
   }
-  
 
   // Insert new entry or update existing one
   if (foundRow === -1) {
@@ -76,7 +81,7 @@ function updateEntry(e) {
 }
 
 function updateGoogleSheetsWithStudentData() {
-  var apiUrl = "FIREBASE-URL"; // replace with your Firebase URL 
+  var apiUrl = "YOUR_FIREBASE_URL"; // Replace with your Firebase URL 
   var response = UrlFetchApp.fetch(apiUrl);
   var data = JSON.parse(response.getContentText());
   
@@ -96,4 +101,30 @@ function updateGoogleSheetsWithStudentData() {
   }
   
   Logger.log('Google Sheet updated with student data.');
+}
+
+function doPost(e) {
+  var url = 'YOUR_NGROK_URL'; // Replace with your Ngrok URL
+  var payload = {
+    'sheet_id': sheet_id  // Your Google Sheets ID
+  };
+  
+  var options = {
+    'method': 'post',  // Make sure it's POST
+    'contentType': 'application/json',
+    'payload': JSON.stringify(payload)
+  };
+  
+  try {
+    var response = UrlFetchApp.fetch(url, options);
+    var result = JSON.parse(response.getContentText());
+    
+    if (result.status === 'success') {
+      Logger.log('Attendance updated successfully');
+    } else {
+      Logger.log('Error updating attendance');
+    }
+  } catch (e) {
+    Logger.log('Request failed: ' + e.message);
+  }
 }
