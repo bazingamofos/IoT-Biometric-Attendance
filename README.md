@@ -35,11 +35,98 @@ Hardware Assembly Pictures
 - A `Code.gs` script fetches the associated student data from Firebase based on the scanned fingerprint ID.
 - Google Sheets automatically logs each student's entry and exit times for easy tracking and record-keeping.
 
-<img src="https://github.com/user-attachments/assets/97b99318-5b3f-42bd-a757-75b8740971fc" alt="" width="600">
+<img src="https://github.com/user-attachments/assets/c35b042a-65af-4c45-a962-91799a8bce89" alt="">
 
 ##
 
-**Project Status: Ongoing**
-- **Remaining Tasks:**
-  - [ ] Implement functionality to mark students as present/absent based on their in and out times, and calculate their attendance percentage.
-  - [ ] Develop a mobile application to facilitate easy collection and management of student data.
+---
+
+# IoT Attendance System - Google Sheets Integration
+
+This project automates the process of updating attendance in a Google Sheet based on data received from an IoT sensor. The data, such as timestamps and sensor readings, is parsed, and the corresponding sheet entries are updated accordingly. The project also synchronizes student data from a Firebase database to Google Sheets for better tracking of student attendance.
+
+## Features
+
+- **Attendance Update**: The system updates attendance based on sensor data, marking students as present or absent based on in-time and out-time.
+- **Student Information Sync**: It syncs student information (name, student ID, email) from Firebase to Google Sheets.
+- **Timely Trigger**: The `doPost` function is triggered automatically every minute to update the attendance status.
+
+## Project Structure
+
+- **Google Sheet**: The attendance data is maintained in a Google Sheet with the following columns:
+  - Column A: Fingerprint ID
+  - Column B: Student Name
+  - Column C: Student ID
+  - Column D: Student Email
+  - Column E: In-time
+  - Column F: Out-time
+  - Additional columns represent attendance for specific dates.
+- **Google Apps Script**: The script handles the parsing of the sensor data and updates the attendance status in the sheet.
+- **Firebase Database**: Syncs student data (name, student ID, and email) from Firebase to Google Sheets.
+
+## How It Works
+
+1. **Attendance Recording**:
+   - The system receives sensor data (such as sensor ID, time, and date) through a GET or POST request.
+   - The `doPost` function is triggered by an external event (such as a button press or sensor data collection) and updates the attendance status.
+   - The system checks if the student has already been recorded for that day and updates their attendance accordingly (in-time, out-time).
+
+2. **Student Information Sync**:
+   - The system fetches student data from Firebase and updates the corresponding student details in the Google Sheet.
+
+3. **Timely Trigger**:
+   - A trigger is set to automatically call the `doPost` function every minute, ensuring attendance data is updated periodically.
+
+## Google Apps Script
+
+The Google Apps Script file handles the following operations:
+
+- **`updateEntry(e)`**: Parses the incoming data (date, time, sensor ID) and updates the attendance status in the Google Sheet.
+- **`updateGoogleSheetsWithStudentData()`**: Syncs student data from Firebase to Google Sheets.
+- **`doPost(e)`**: This function is triggered every minute by a time-driven trigger and sends a POST request to update attendance.
+
+## Setup Instructions
+
+### 1. **Google Sheets Setup**:
+   - Create a Google Sheet with the necessary columns: Fingerprint ID, Student Name, Student ID, Student Email, In-time, Out-time, and attendance columns for dates.
+   - Note down the `Sheet ID` (found in the URL of your Google Sheet) and replace `"YOUR_SHEET_ID"` in the script with the actual Sheet ID.
+
+### 2. **Firebase Setup**:
+   - Create a Firebase project and store student data in the database. The student data should include `fing_id`, `name`, `stud_id`, and `stud_email`.
+   - Replace `"YOUR_FIREBASE_URL"` in the script with your Firebase database URL.
+
+### 3. **Ngrok Setup**:
+   - Ngrok is used for creating a secure tunnel to your local development environment, so the `doPost` function can send data to an external URL.
+   - Replace `"YOUR_NGROK_URL"` in the script with your Ngrok URL.
+
+### 4. **Setting up Google Apps Script Trigger**:
+   - In the Google Apps Script editor, go to **Triggers** (clock icon) in the sidebar.
+   - Create a new trigger for the `doPost` function, set it to run **Time-driven** every **minute**.
+
+### 5. **Deploying the Script**:
+   - After setting up the script, deploy it as a web app with appropriate permissions to allow external requests to interact with it.
+   - Ensure that the script is authorized to access both Google Sheets and Firebase.
+
+## Requirements
+
+1. **Google Sheets API**
+2. **Firebase Realtime Database**
+3. **Ngrok for local tunneling**
+4. **Google Apps Script**
+
+### Google Apps Script Permissions
+Make sure that the Google Apps Script has the necessary permissions to:
+- Read and update Google Sheets.
+- Make requests to external URLs (Firebase, Ngrok).
+
+## Example Workflow
+
+1. A student scans their fingerprint using the IoT sensor, triggering a request with their sensor ID and time.
+2. The `doPost` function is called, and attendance is updated in Google Sheets for the student.
+3. Every minute, the `doPost` function is triggered to ensure attendance data is kept up to date.
+
+## License
+
+This project is licensed under the **GNU General Public License** (GPL) Version 3, 29 June 2007.
+
+See the [LICENSE](LICENSE) file for more details.
