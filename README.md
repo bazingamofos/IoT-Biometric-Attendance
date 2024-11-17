@@ -74,7 +74,7 @@ This project automates the process of updating attendance in a Google Sheet base
 
 1. **Attendance Recording**:
    - The system receives sensor data (such as sensor ID, time, and date) through a GET or POST request.
-   - The `doPost` function is triggered by an external event (such as a button press or sensor data collection) and updates the attendance status.
+   - The `doPost` function is triggered every minute by a time-driven trigger and sends a POST request to update attendance status and percentage.
    - The system checks if the student has already been recorded for that day and updates their attendance accordingly (in-time, out-time).
 
 2. **Student Information Sync**:
