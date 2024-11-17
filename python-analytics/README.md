@@ -49,7 +49,7 @@ To interact with Google Sheets, you need to set up the Google Sheets API and aut
 
 1. Go to the [Google Cloud Console](https://console.cloud.google.com/).
 2. Create a new project (or use an existing one).
-3. Enable the **Google Sheets API** and **Google Drive API**.
+3. Enable the **Google Sheets API**.
 4. Create **Service Account Credentials** and download the `credentials.json` file.
 5. Rename the downloaded credentials file to `credentials.json` and place it in the root of the project directory.
 6. Share the Google Sheet (you will be interacting with) with the service account’s email address (found in the `credentials.json`).
