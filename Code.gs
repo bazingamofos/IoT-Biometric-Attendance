@@ -39,6 +39,15 @@ function updateEntry(e) {
       uniqueDateFound = true; // Date already exists, so don't insert a new column
       break;
     }
+    
+  }
+
+  // Clear in-time and out-time columns for all rows if a new date is detected
+  if (!uniqueDateFound) {
+    for (var i = 2; i <= lastRow; i++) {
+      sheet.getRange(i, 5).setValue(""); // Clear in-time
+      sheet.getRange(i, 6).setValue(""); // Clear out-time
+    }
   }
 
   // Check for existing entry
@@ -50,10 +59,8 @@ function updateEntry(e) {
     }
   }
 
-  // Insert date if unique and only if `foundRow` is a valid row
-  if (!uniqueDateFound && foundRow > 0) {
-    sheet.getRange(foundRow, 5).setValue("");
-    sheet.getRange(foundRow, 6).setValue("");
+  // Insert date if unique
+  if (!uniqueDateFound) {
     for (var k = 1; k <= lastCol; k++) {
       if (sheet.getRange(1, k + 1).getValue() == "") {
         sheet.getRange(1, k + 1).setValue(date);
