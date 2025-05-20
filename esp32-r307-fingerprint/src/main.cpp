@@ -10,28 +10,37 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include <bitmaps.h>
+#include <professors.h>
 #include <HTTPClient.h> 
 #include <FastLED.h>
 #include "time.h"
+#include <ArduinoJson.h>
 
 // Global Variables ========================================
 
 int n = 0;
+int currentCourseIndex = 0;
+bool courseSelected = false;
+String selectedCourse = "";
+bool professorVerified = false;
+bool attendanceMode = false;
+int professorID = -1;
+int profIndex = -1;  // <-- Added global variable
 
 // WiFi ====================================================
 
-#define WIFI_SSID "WIFI_SSID"
-#define WIFI_PASSWORD "WIFI_PASSWORD"
+#define WIFI_SSID "YOUR_WIFI_SSID"
+#define WIFI_PASSWORD "YOUR_WIFI_PASSWORD"
 
-// HTTP ====================================================
+// Supabase ================================================
 
-const char* ntpServer = "pool.ntp.org";
-const long  gmtOffset_sec = 19800;
-const int   daylightOffset_sec = 0;
+const char* SUPABASE_URL = "https://your-project.supabase.co"; 
+const char* SUPABASE_API_KEY  = "YOUR_SUPABASE_API_KEY";       
+String SUPABASE_TABLE_NAME = "LY1_Electronics";
 
 // Google Sheets ===========================================
 
-String GOOGLE_SCRIPT_ID = "YOUR_SCRIPT_ID";    
+String GOOGLE_SCRIPT_ID = "YOUR_GOOGLE_SCRIPT_ID";    
 
 // Buzzer ==================================================
 
@@ -51,12 +60,18 @@ Adafruit_Fingerprint finger = Adafruit_Fingerprint(&serialPort);
 
 // OLED ====================================================
 
-#define SCREEN_WIDTH 128 // OLED display width, in pixels
-#define SCREEN_HEIGHT 64 // OLED display height, in pixels
-#define OLED_RESET     -1 // Reset pin # (or -1 if sharing Arduino reset pin)
-#define SCREEN_ADDRESS 0x3C ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
+#define SCREEN_WIDTH 128
+#define SCREEN_HEIGHT 64
+#define OLED_RESET     -1
+#define SCREEN_ADDRESS 0x3C
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
+// Button ==================================================
+
+#define BUTTON_PIN 4
+unsigned long buttonPressStart = 0;
+bool buttonPressed = false;
+bool longPressHandled = false;
 
 // Initialize WiFi
 void initWiFi() {
@@ -64,9 +79,9 @@ void initWiFi() {
     Serial.print("Connecting to WiFi ..");
 
     display.clearDisplay();
-    display.setTextSize(1);             // Normal 1:1 pixel scale
-    display.setTextColor(WHITE);        // Draw white text
-    display.setCursor(0, 0);             // Start at top-left corner
+    display.setTextSize(1);
+    display.setTextColor(WHITE);
+    display.setCursor(0, 0);
     display.print(F("Connecting to \n"));
     display.setCursor(0, 50);   
     display.setTextSize(2);          
@@ -80,9 +95,9 @@ void initWiFi() {
     }
 
     display.clearDisplay();
-    display.setTextSize(2);             // Normal 1:1 pixel scale
-    display.setTextColor(WHITE);        // Draw white text
-    display.setCursor(8, 0);             // Start at top-left corner
+    display.setTextSize(2);
+    display.setTextColor(WHITE);
+    display.setCursor(8, 0);
     display.print(F("Connected \n"));
     display.drawBitmap( 33, 15, Wifi_connected_bits, Wifi_connected_width, Wifi_connected_height, WHITE);
     display.display();
@@ -91,9 +106,77 @@ void initWiFi() {
     Serial.println();
 }
 
-// returns -1 if failed, otherwise returns ID #
-int getFingerprintIDez()
-{
+void markAttendance(int fing_id, const String& courseCode) {
+    HTTPClient http;
+    String endpoint = String(SUPABASE_URL) + "/rest/v1/" + SUPABASE_TABLE_NAME;
+
+    http.begin(endpoint);
+    http.addHeader("Content-Type", "application/json");
+    http.addHeader("apikey", SUPABASE_API_KEY);
+    http.addHeader("Authorization", "Bearer " + String(SUPABASE_API_KEY));
+
+    StaticJsonDocument<200> jsonDoc;
+    jsonDoc["fing_id"] = fing_id;
+    jsonDoc["course_code"] = courseCode;
+    jsonDoc["attendance"] = true;
+
+    String requestBody;
+    serializeJson(jsonDoc, requestBody);
+
+    int responseCode = http.POST(requestBody);
+    Serial.println("Attendance Insert Response Code: " + String(responseCode));
+    Serial.println(http.getString());
+    http.end();
+}
+
+void displayCourses(String courses[], int courseCount, int selectedIndex) {
+    display.clearDisplay();
+    display.setTextSize(1);
+    display.setTextColor(WHITE);
+    for (int i = 0; i < courseCount; i++) {
+        if (i == selectedIndex) {
+            display.fillRect(0, i * 16, 128, 16, WHITE);
+            display.setTextColor(BLACK);
+            display.setCursor(5, i * 16 + 4);
+            display.println(courses[i]);
+            display.setTextColor(WHITE);
+        } else {
+            display.setCursor(5, i * 16 + 4);
+            display.println(courses[i]);
+        }
+    }
+    display.display();
+}
+
+void handleButton(String courses[], int courseCount) {
+    if (digitalRead(BUTTON_PIN) == LOW) {
+        if (!buttonPressed) {
+            buttonPressed = true;
+            buttonPressStart = millis();
+            longPressHandled = false;
+        } else {
+            if (millis() - buttonPressStart > 1000 && !longPressHandled) {
+                longPressHandled = true;
+                if (!courseSelected) {
+                    courseSelected = true;
+                    // Get the course code (id), not name
+                    selectedCourse = professors[profIndex].courses[currentCourseIndex].id;
+                    Serial.println("Selected course: " + selectedCourse);
+                }
+            }
+        }
+    } else {
+        if (buttonPressed) {
+            if (!longPressHandled) {
+                currentCourseIndex = (currentCourseIndex + 1) % courseCount;
+                displayCourses(courses, courseCount, currentCourseIndex);
+            }
+            buttonPressed = false;
+        }
+    }
+}
+
+int getFingerprintIDez() {
     uint8_t p = finger.getImage();
     if (p != FINGERPRINT_OK)
         return 0;
@@ -109,187 +192,149 @@ int getFingerprintIDez()
     return finger.fingerID;
 }
 
-void setup()
-{
+void setup() {
     Serial.begin(115200);
-
-    // LED =====================================================
     FastLED.addLeds<WS2812, LED_PIN, GRB>(leds, NUM_LEDS);
 
-    // OLED ====================================================
     if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
         Serial.println(F("SSD1306 allocation failed"));
-        for(;;); // Don't proceed, loop forever
+        for(;;);
     }
     display.clearDisplay();
-
-    // WiFi ====================================================
     initWiFi();
-    // delay(2000); // Give time for NTP synchronization
 
-    // Buzzer ==================================================
     pinMode(buzzer, OUTPUT);
-    digitalWrite(buzzer, 1);
+    digitalWrite(buzzer, 0);
+    pinMode(BUTTON_PIN, INPUT_PULLUP);
 
-    // Sensor ==================================================
-    while (!Serial)
-        ; // For Yun/Leo/Micro/Zero/...
+    while (!Serial);
     delay(100);
     Serial.println("\n\nAdafruit finger detect test");
 
-    // set the data rate for the sensor serial port
     finger.begin(57600);
     delay(5);
-    if (finger.verifyPassword())
-    {
+    if (finger.verifyPassword()) {
         Serial.println("Found fingerprint sensor!");
-    }
-    else
-    {
+    } else {
         Serial.println("Did not find fingerprint sensor :(");
-        while (1)
-        {
-            delay(1);
-        }
+        while (1) { delay(1); }
     }
-    
-    Serial.println(F("Reading sensor parameters"));
+
     finger.getParameters();
-    Serial.print(F("Status: 0x"));
-    Serial.println(finger.status_reg, HEX);
-    Serial.print(F("Sys ID: 0x"));
-    Serial.println(finger.system_id, HEX);
-    Serial.print(F("Capacity: "));
-    Serial.println(finger.capacity);
-    Serial.print(F("Security level: "));
-    Serial.println(finger.security_level);
-    Serial.print(F("Device address: "));
-    Serial.println(finger.device_addr, HEX);
-    Serial.print(F("Packet len: "));
-    Serial.println(finger.packet_len);
-    Serial.print(F("Baud rate: "));
-    Serial.println(finger.baud_rate);
-    
     finger.getTemplateCount();
-    
-    if (finger.templateCount == 0)
-    {
+
+    if (finger.templateCount == 0) {
         Serial.print("Sensor doesn't contain any fingerprint data. Please run the 'enroll' example.");
-    }
-    else
-    {
+    } else {
         Serial.println("Waiting for valid finger...");
         Serial.print("Sensor contains ");
         Serial.print(finger.templateCount);
         Serial.println(" templates");
     }
-
-    // Init and get the time
-    configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
 }
 
-void loop()
-{
-    struct tm timeinfo;
-    if (!getLocalTime(&timeinfo)) {
-        Serial.println("Failed to obtain time");
-        return;
-    }
-     // Separate date and time
-    char dateStringBuff[20];
-    strftime(dateStringBuff, sizeof(dateStringBuff), "%d/%m/%Y", &timeinfo); // Date in DD/MM/YYYY format
-    String dateString(dateStringBuff);
-
-    char timeStringBuff[10];
-    strftime(timeStringBuff, sizeof(timeStringBuff), "%H:%M:%S", &timeinfo); // Time only
-    String timeString(timeStringBuff);
-    // Serial.print("Date:");
-    // Serial.println(dateString);
-
-    n = getFingerprintIDez();
-
-    if(n == 0){
-        // Serial.println("No finger detected");
-        
+void loop() {
+    if (!courseSelected) {
         display.clearDisplay();
-        display.drawBitmap( 32, 0, FinPr_start_bits, FinPr_start_width, FinPr_start_height, WHITE);
+        display.setTextSize(1);
+        display.setTextColor(WHITE);
+        display.setCursor(2, 25); 
+        display.println(F("Please scan to start"));
         display.display();
+
+        int profID = getFingerprintIDez();
+
+        if (profID >= 50 && profID <= 53) {
+            profIndex = profID - 50;
+            display.clearDisplay();
+            display.setTextSize(1);
+            display.setTextColor(WHITE);
+            display.setCursor(0, 0);
+            display.println("Welcome,");
+            display.setCursor(0, 16);
+            display.setTextSize(2);
+            display.println(professors[profIndex].name);
+            display.display();
+            delay(1500);
+
+            String courseNames[2];
+            for (int i = 0; i < 2; i++) {
+                courseNames[i] = professors[profIndex].courses[i].name;
+            }
+
+            displayCourses(courseNames, 2, currentCourseIndex);
+            while (!courseSelected) {
+                handleButton(courseNames, 2);
+                delay(100);
+            }
+        } else if (profID > 0) {
+            display.clearDisplay();
+            display.setCursor(10, 25);
+            display.println("Access denied");
+            display.display();
+            delay(1500);
+        }
+    } else {
+        int scanID = getFingerprintIDez();
+
+        if (scanID == 0){
+            display.clearDisplay();
+            display.drawBitmap( 32, 0, FinPr_start_bits, FinPr_start_width, FinPr_start_height, WHITE);
+            display.display();
+        }
+        else if (scanID == -1){
+            display.clearDisplay();
+            display.drawBitmap( 34, 0, FinPr_invalid_bits, FinPr_invalid_width, FinPr_invalid_height, WHITE);
+            display.display();
+            digitalWrite(buzzer, 1);
+            leds[0] = CRGB(255, 0, 0);
+            FastLED.show();
+            delay(800);
+            digitalWrite(buzzer, 0);
+            leds[0] = CRGB(0, 0, 0);
+            FastLED.show();
+        }
+        else {
+            if (scanID >= 50 && scanID <= 53) {
+                courseSelected = false;
+                currentCourseIndex = 0;
+                selectedCourse = "";
+                return;
+            }
+
+            Serial.print("Found ID #");
+            Serial.print(finger.fingerID);
+            Serial.print(" with confidence of ");
+            Serial.println(finger.confidence);
+
+            markAttendance(scanID, selectedCourse);
+
+            display.clearDisplay();
+            display.drawBitmap( 34, 0, FinPr_valid_bits, FinPr_valid_width, FinPr_valid_height, WHITE);
+            display.display();
+            delay(200);
+
+            display.clearDisplay();
+            display.setTextSize(1); 
+            display.setTextColor(SSD1306_WHITE);
+            display.setCursor(5, 5);
+            display.println(F("Captured ID"));
+            display.setCursor(15, 25);
+            display.setTextSize(2);
+            display.print(F("#"));
+            display.print(finger.fingerID);
+            display.display();
+
+            digitalWrite(buzzer, 1);
+            leds[0] = CRGB(0, 255, 0);
+            FastLED.show();
+            delay(100);
+            digitalWrite(buzzer, 0);
+            delay(300);
+            leds[0] = CRGB(0, 0, 0);
+            FastLED.show();
+        }
+
+        handleButton(nullptr, 0);
     }
-
-    else if(n == -1){
-        Serial.println("Did not find a match");
-        
-        // Display
-        display.clearDisplay();
-        display.drawBitmap( 34, 0, FinPr_invalid_bits, FinPr_invalid_width, FinPr_invalid_height, WHITE);
-        display.display();
-        
-        // Activate Buzzer and LED
-        digitalWrite(buzzer, 0);
-        leds[0] = CRGB(255, 0, 0);
-        FastLED.show();
-        delay(800);
-        digitalWrite(buzzer, 1);
-        leds[0] = CRGB(0, 0, 0);
-        FastLED.show();
-    }
-
-    else{
-        // found a match!
-        Serial.print("Found ID #");
-        Serial.print(finger.fingerID);
-        Serial.print(" with confidence of ");
-        Serial.println(finger.confidence);
-
-        // Display
-        display.clearDisplay();
-        display.drawBitmap( 34, 0, FinPr_valid_bits, FinPr_valid_width, FinPr_valid_height, WHITE);
-        display.display();
-        delay(200);
-        
-        display.clearDisplay();
-        display.setTextSize(1); 
-        display.setTextColor(SSD1306_WHITE);
-        display.setCursor(5, 5);
-        display.println(F("Captured ID"));
-        display.setCursor(15, 25);
-        display.setTextSize(2);
-        display.print(F("#"));
-        display.print(finger.fingerID);
-        display.display();
-        
-        // Activate Buzzer and LED
-        digitalWrite(buzzer, 0);
-        leds[0] = CRGB(0, 255, 0);
-        FastLED.show();
-        delay(100);
-        digitalWrite(buzzer, 1);
-        delay(300);
-        leds[0] = CRGB(0, 0, 0);
-        FastLED.show();
-        
-        // send to Google Sheets
-        String urlFinal = "https://script.google.com/macros/s/" + String(GOOGLE_SCRIPT_ID) + "/exec?date=" + dateString + "&time=" + timeString + "&sensor=" + String(finger.fingerID);
-        Serial.print("POST data to spreadsheet: ");
-        Serial.println(urlFinal);
-        HTTPClient http;
-        http.begin(urlFinal.c_str());
-        http.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
-        int httpCode = http.GET();
-        Serial.print("HTTP Status Code: ");
-        Serial.println(httpCode);
-        //---------------------------------------------------------------------
-        //getting response from google sheet
-        // String payload;
-        // if (httpCode > 0) {
-        //     payload = http.getString();
-        //     Serial.println("Payload: "+payload);    
-        // }
-        //---------------------------------------------------------------------
-        http.end();
-    }
-
-    // delay(50); // don't ned to run this at full speed.
-
-
 }
